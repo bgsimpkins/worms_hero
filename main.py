@@ -1,6 +1,7 @@
 import pygame as pg
 from enum import Enum
-from hero_sprites import WormSegment, Worm, SegmentType
+from hero_sprites import WormSegment, Worm
+from text import DebugPanel
 
 
 class GameMode(Enum):
@@ -8,7 +9,7 @@ class GameMode(Enum):
     STANDARD_PLAY = 1
     END_SCREEN = 10
 
-
+debug = True
 
 game_mode = GameMode(GameMode.STANDARD_PLAY)
 pg.init()
@@ -17,9 +18,7 @@ clock = pg.time.Clock()
 
 running = True
 
-# Display The Background
-screen.fill("black")
-pg.display.flip()
+debug = DebugPanel(screen)
 
 #allsprites = pg.sprite.RenderPlain(worm_sprite)
 
@@ -27,7 +26,7 @@ worm = Worm()
 
 def update_standard_play(dt):
     # Update worm sprite group
-    worm.update()
+    worm.update(dt)
 
     screen.fill("black")
 
@@ -45,6 +44,13 @@ def game_end():
 def load_level():
     pass
 
+def show_debug():
+    mess_list = []
+    for s in worm.sprites():
+        mess_list.append(f'{s.target_position}')
+
+    debug.set_message_list(mess_list)
+    debug.render()
 
 dt = 1
 while running:
@@ -56,6 +62,9 @@ while running:
         pass        # TODO: Add start screen stuff
     elif game_mode == GameMode.STANDARD_PLAY:
         update_standard_play(dt)
+
+    if debug:
+        show_debug()
 
     pg.display.flip()
 
