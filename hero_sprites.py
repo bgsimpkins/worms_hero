@@ -68,12 +68,12 @@ class Worm(pg.sprite.RenderPlain):
         self.add(head)
 
         seg = WormSegment(WormSegment.SegmentType.MIDDLE)
-        seg.move(head.rect.x+head.rect.width, 300)
+        seg.move(head.rect.x-head.rect.width, 300)
         seg.set_new_target({"x": head.rect.x,"y":head.rect.y}, WormDirection.LEFT)
         self.add(seg)
 
         tail = WormSegment(WormSegment.SegmentType.TAIL)
-        tail.move(seg.rect.x + head.rect.width, 300)
+        tail.move(seg.rect.x-head.rect.width, 300)
         tail.set_new_target({"x": seg.rect.x, "y": seg.rect.y}, WormDirection.LEFT)
         self.add(tail)
 
@@ -88,12 +88,12 @@ class Worm(pg.sprite.RenderPlain):
         head: WormSegment = self.sprites()[0]
         did_move, dir_change = self.move_head(dt)
 
-        # If head has changed direction, update first segment target if exists
-        if dir_change and len(self.sprites()) > 1:
-            self.sprites()[1].set_new_target({"x": head.rect.x,"y":head.rect.y}, head.direction)
+        # # If head has changed direction, update first segment target if exists
+        # if dir_change and len(self.sprites()) > 1:
+        #     self.sprites()[1].set_new_target({"x": head.rect.x,"y":head.rect.y}, head.direction)
 
-        if did_move:
-            self.move_segs(dt)
+        # if did_move:
+        #     self.move_segs(dt)
 
     def move_head(self, dt):
         keys = pg.key.get_pressed()
@@ -103,23 +103,24 @@ class Worm(pg.sprite.RenderPlain):
         prev_direction = head.direction
 
         if keys[pg.K_w]:
-            head.set_rotate(270)
+            head.set_rotate(90)
             head.move(0, -self.speed * dt)
             head.direction = WormDirection.UP
             did_move = True
         elif keys[pg.K_s]:
-            head.set_rotate(90)
+            head.set_rotate(270)
             head.move(0, self.speed * dt)
             head.direction = WormDirection.DOWN
             did_move = True
         elif keys[pg.K_a]:
             head.set_rotate(0)
+            head.flip_x()
             head.move(-self.speed * dt, 0)
             head.direction = WormDirection.LEFT
             did_move = True
         elif keys[pg.K_d]:
             head.set_rotate(0)
-            head.flip_x()
+
             head.move(self.speed * dt, 0)
             head.direction = WormDirection.RIGHT
             did_move = True

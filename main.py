@@ -47,7 +47,7 @@ def load_level():
 def show_debug():
     mess_list = []
     for s in worm.sprites():
-        mess_list.append(f'{s.target_position}')
+        mess_list.append(f'{s.target_position} | {s.direction}')
 
     debug.set_message_list(mess_list)
     debug.render()
