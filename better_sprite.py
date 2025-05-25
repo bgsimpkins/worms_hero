@@ -23,6 +23,14 @@ class BetterSprite(pg.sprite.Sprite):
         self.image = pg.transform.rotate(self.orig, self.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
+    def set_position(self,x, y, center=False):
+        if center:
+            self.rect.centerx = x
+            self.rect.centery = y
+        else:
+            self.rect.x = x
+            self.rect.y = y
+
     def move(self, x, y):
         self.rect = self.rect.move(x, y)
 
@@ -31,6 +39,18 @@ class BetterSprite(pg.sprite.Sprite):
 
     def flip_y(self):
         self.image = pg.transform.flip(self.image, 0, 1)
+
+    def x(self):
+        return self.rect.centerx
+
+    def y(self):
+        return self.rect.centery
+
+    def width(self):
+        return self.rect.width
+
+    def height(self):
+        return self.rect.height
 
     # def update(self):
     #     self.angle += 2
