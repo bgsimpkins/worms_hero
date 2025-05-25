@@ -1,7 +1,7 @@
 from enum import Enum
 import pygame as pg
 from better_sprite import BetterSprite
-
+import math
 
 
 
@@ -64,18 +64,18 @@ class Worm(pg.sprite.RenderPlain):
         ### init with head, segment, and tail
 
         head = WormSegment(WormSegment.SegmentType.HEAD)
-        head.move(300,300)
+        head.set_position(300,300)
         self.add(head)
 
         seg = WormSegment(WormSegment.SegmentType.MIDDLE)
-        seg.move(head.rect.x-head.rect.width, 300)
+        seg.set_position(head.rect.x-head.rect.width, 300)
         seg.set_new_target({"x": head.rect.x,"y":head.rect.y}, WormDirection.LEFT)
         self.add(seg)
 
-        tail = WormSegment(WormSegment.SegmentType.TAIL)
-        tail.move(seg.rect.x-head.rect.width, 300)
-        tail.set_new_target({"x": seg.rect.x, "y": seg.rect.y}, WormDirection.LEFT)
-        self.add(tail)
+        # tail = WormSegment(WormSegment.SegmentType.TAIL)
+        # tail.set_position(seg.rect.x-head.rect.width, 300)
+        # tail.set_new_target({"x": seg.rect.x, "y": seg.rect.y}, WormDirection.LEFT)
+        # self.add(tail)
 
     def update(self, dt):
         self.update_move(dt)
@@ -86,14 +86,10 @@ class Worm(pg.sprite.RenderPlain):
 
         # Move head. See if direction changed
         head: WormSegment = self.sprites()[0]
+
         did_move, dir_change = self.move_head(dt)
 
-        # # If head has changed direction, update first segment target if exists
-        # if dir_change and len(self.sprites()) > 1:
-        #     self.sprites()[1].set_new_target({"x": head.rect.x,"y":head.rect.y}, head.direction)
-
-        # if did_move:
-        #     self.move_segs(dt)
+        self.move_segs(dt)
 
     def move_head(self, dt):
         keys = pg.key.get_pressed()
@@ -129,11 +125,29 @@ class Worm(pg.sprite.RenderPlain):
         return did_move, (head.direction != prev_direction)
 
     def move_segs(self, dt):
-        for s in self.sprites()[1:]:
-            if s.direction == WormDirection.UP:
-                if s.rect.y <= s.target_position['y']:
-                    s.move(0, -self.speed * dt)
-                # else:
+        i = 0
+        for seg in self.sprites()[1:]:
+            seg: WormSegment = seg
+            prev_seg:WormSegment = self.sprites()[i]
+
+            # Calcuate angle to previous seg
+            y_diff = prev_seg.y() - seg.y()
+            x_diff = prev_seg.x() - seg.x()
+
+            # Get angle from head to seg
+            angle = math.atan2(y_diff, x_diff)
+            angle_deg = math.degrees(angle)
+
+            # set rotation to point at previous seg
+            seg.set_rotate(-angle_deg)
+
+            # # Snap position to edge of previous seg
+            new_x = prev_seg.x() - (58 * math.cos(angle))
+            new_y = prev_seg.y() + (58 * math.sin(angle))
+
+            seg.set_position(new_x, new_y, center=True)
+
+            i += 1
 
 
 
