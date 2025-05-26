@@ -35,8 +35,6 @@ def update_standard_play(dt):
     # screen.blit(worm_sprite.image,worm_sprite.pos)
 
 
-
-
 def game_end():
     pass
 
@@ -46,8 +44,10 @@ def load_level():
 
 def show_debug():
     mess_list = []
+    s:WormSegment
     for s in worm.sprites():
-        mess_list.append(f'{s.target_position} | {s.direction}')
+        target:WormSegment.MoveTarget = "none" if len(s.target_list) == 0 else f"x={s.target_list[0].x} y={s.target_list[0].y}"
+        mess_list.append(f'target: {target} | {s.direction}')
 
     debug.set_message_list(mess_list)
     debug.render()
@@ -72,7 +72,4 @@ while running:
     # dt is delta time in seconds since last frame, used for framerate-
     # independent physics.
     dt = clock.tick(60) / 1000
-
-
-
 
