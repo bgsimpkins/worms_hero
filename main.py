@@ -43,11 +43,20 @@ def load_level():
     pass
 
 def show_debug():
+
     mess_list = []
     s:WormSegment
+    i:int = 0
+
     for s in worm.sprites():
-        target:WormSegment.MoveTarget = "none" if len(s.target_list) == 0 else f"x={s.target_list[0].x} y={s.target_list[0].y}"
-        mess_list.append(f'target: {target} | {s.direction}')
+
+        mess_list.append(f"{i}")
+
+        for t in s.target_list:
+
+            target = f"x={t.x} y={t.y}"
+            mess_list.append(f'    target: {target} | {t.direction}')
+        i += 1
 
     debug.set_message_list(mess_list)
     debug.render()
