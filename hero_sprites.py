@@ -29,16 +29,16 @@ class WormSegment(BetterSprite):
     def __init__(self, seg_type:SegmentType, target_position=None, direction: WormDirection = WormDirection.LEFT):
 
         self.seg_type = seg_type
-        if seg_type == self.SegmentType.HEAD:
-            self.image = pg.image.load('assets/characters/worm_head.png').convert_alpha()
-        elif seg_type == self.SegmentType.MIDDLE:
-            self.image = pg.image.load('assets/characters/worm_middle.png').convert_alpha()
-        elif seg_type == self.SegmentType.TAIL:
-            self.image = pg.image.load('assets/characters/worm_tail.png').convert_alpha()
 
-        # image and rect are Required by Group to wrap rendering
-        self.image = pg.transform.scale_by(self.image, (.5, .5))
-        BetterSprite.__init__(self, self.image)  # call super constructor
+        image_file = None
+        if seg_type == self.SegmentType.HEAD:
+            image_file = 'assets/characters/worm_head.png'
+        elif seg_type == self.SegmentType.MIDDLE:
+            image_file = 'assets/characters/worm_middle.png'
+        elif seg_type == self.SegmentType.TAIL:
+            image_file = 'assets/characters/worm_tail.png'
+
+        BetterSprite.__init__(self, image_file, scale=.5)  # call super constructor
 
         self.direction = WormDirection.RIGHT
         self.target_list = []
@@ -109,16 +109,18 @@ class Worm(pg.sprite.RenderPlain):
 
         # Move head. See if direction changed
         head: WormSegment = self.sprites()[0]
-        did_move, dir_change = self.move_head(dt)
+        did_move, dir_change, head_loc_before_move = self.move_head(dt)
 
         # # If head has changed direction, update first segment target if exists
         if dir_change and len(self.sprites()) >= 1:
 
+            target_to_add = head_loc_before_move
+            print(f'Head direction change: {target_to_add}')
             s:WormSegment
             i: int = 1
             for s in self.sprites()[1:]:
-                parent_seg = self.sprites()[i - 1]
-                s.add_move_target({"x": head.x(), "y": head.y()}, head.direction)
+
+                s.add_move_target(target_to_add, head.direction)
 
                 i+= 1
 
@@ -131,6 +133,7 @@ class Worm(pg.sprite.RenderPlain):
         head: WormSegment = self.sprites()[0]
         did_move = False
         prev_direction = head.direction
+        location_before_move = head.get_position()
 
         if keys[pg.K_w]:
             head.set_rotate(90)
@@ -156,7 +159,7 @@ class Worm(pg.sprite.RenderPlain):
             did_move = True
 
         # Return bool to indicate if direction changed
-        return did_move, (head.direction != prev_direction)
+        return did_move, (head.direction != prev_direction), location_before_move
 
     def move_segs(self, dt, head):
 
@@ -185,7 +188,9 @@ class Worm(pg.sprite.RenderPlain):
                 target_position: WormSegment.MoveTarget = s.target_list[0]
                 s.set_direction(new_direction)
 
-                self.move_single_seg(dt, s, target_position)
+                reached_target = self.move_single_seg(dt, s, target_position)
+                if reached_target:
+                    print('reached target for new move. Shouldn''t happen!')
 
 
             i += 1
@@ -193,28 +198,32 @@ class Worm(pg.sprite.RenderPlain):
     def move_single_seg(self, dt, s:WormSegment, target_position:WormSegment.MoveTarget):
         reached_target = False
         if s.direction == WormDirection.UP:
-            if s.y() >= target_position.y:
+            if s.y() > target_position.y:
                 s.move(0, -self.speed * dt)
             else:
-                reached_target = True
+                #s.set_position(target_position.x, target_position.y)
+                return True         #reached target
         elif s.direction == WormDirection.DOWN:
-            if s.y() <= target_position.y:
+            if s.y() < target_position.y:
                 s.move(0, self.speed * dt)
             else:
-                reached_target = True
+                #s.set_position(target_position.x, target_position.y)
+                return True         #reached target
         elif s.direction == WormDirection.LEFT:
-            if s.x() >= target_position.x:
+            if s.x() > target_position.x:
                 s.move(-self.speed * dt, 0)
             else:
-                reached_target = True
+                #s.set_position(target_position.x, target_position.y)
+                return True         #reached target
         elif s.direction == WormDirection.RIGHT:
-            if s.x() <= target_position.x:
+            if s.x() < target_position.x:
                 s.move(self.speed * dt, 0)
             else:
-                reached_target = True
+                #s.set_position(target_position.x, target_position.y)
+                return True         #reached target
 
 
-        return reached_target
+        return False
 
 
 

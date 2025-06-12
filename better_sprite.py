@@ -2,13 +2,16 @@ import pygame as pg
 
 
 class BetterSprite(pg.sprite.Sprite):
-    def __init__(self, image):
+    def __init__(self, image_file, scale=1):
         pg.sprite.Sprite.__init__(self)  # call super constructor
 
         # image and rect are Required by Group to wrap rendering
         # self.image = pg.transform.scale_by(self.image, (.5, .5))
 
-        self.image: pg.Surface = image
+        print(f'{image_file}: {self.__hash__()}')
+
+        self.image: pg.Surface = pg.image.load(image_file).convert_alpha()
+        self.image = pg.transform.scale_by(self.image, (scale, scale))
         self.orig = self.image
         self.rect: pg.Rect = self.image.get_rect()
         self.angle = 0
@@ -39,6 +42,7 @@ class BetterSprite(pg.sprite.Sprite):
 
     def move(self, x, y):
         self.rect = self.rect.move(x, y)
+        print(f"move: {self.__hash__()}: x={x} y={y}")
 
     def flip_x(self):
         self.image = pg.transform.flip(self.image, 1, 0)
@@ -57,6 +61,9 @@ class BetterSprite(pg.sprite.Sprite):
 
     def height(self):
         return self.rect.height
+
+    def render(self, screen):
+        screen.blit(self.image,self.rect)
 
     # def update(self):
     #     self.angle += 2
