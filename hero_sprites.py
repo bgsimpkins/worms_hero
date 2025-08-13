@@ -42,7 +42,7 @@ class WormSegment(BetterSprite):
         BetterSprite.__init__(self, image_file, scale=.5)  # call super constructor
 
         self.direction = WormDirection.RIGHT
-        self.target_list = []
+        self.target_list: list[WormSegment.MoveTarget] = list()
 
 
     def add_move_target(self, target_position:dict, direction):
