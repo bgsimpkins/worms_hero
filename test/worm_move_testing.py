@@ -137,7 +137,6 @@ while m_i >= 0 and s_i < len(seg_list):
             s_i += 1
 
     else:   #Nowhere to go. Just stack seg on last one.
-        ##TODO: this is never called because of m_i >= 0 in loop
         print('stacking because no more in move list')
         seg_list[s_i]['x'] = running_x
         seg_list[s_i]['y'] = running_y
