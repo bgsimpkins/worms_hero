@@ -10,6 +10,7 @@ class WormDirection(Enum):
     UP = 1
     RIGHT = 2
     DOWN = 3
+    NONE = -1
 
 
 class WormSegment(BetterSprite):
